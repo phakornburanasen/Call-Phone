@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบ Call มารับโทรศัพท์</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            min-height: 100vh;
+            background: #f5f7fb;
+            color: #2d3436;
+            text-align: center;
+            padding-bottom: 40px;
+        }
+
+        /* ===== HEADER ===== */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3436;
+            letter-spacing: 2px;
+            margin: 30px 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        h1::before {
+            content: '\f095';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        h1::after {
+            content: '\f095';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: scaleX(-1);
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: #ffffff;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+            padding: 12px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar a {
+            color: #636e72;
+            padding: 10px 22px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+        .navbar a i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        .navbar a:hover {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 184, 148, 0.3);
+        }
+
+        /* ===== RADIO GROUP ===== */
+        .radio-group {
+            margin: 25px auto 15px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .radio-group label {
+            position: relative;
+            font-size: 15px;
+            font-weight: 500;
+            color: #2d3436;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            padding: 14px 24px;
+            background: #ffffff;
+            border-radius: 14px;
+            border: 2px solid #e8e8e8;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .radio-group label:hover {
+            border-color: #00b894;
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.12);
+        }
+        .radio-group input[type="radio"] {
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid #b2bec3;
+            outline: none;
+            position: relative;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        .radio-group input[type="radio"]:checked {
+            border-color: #00b894;
+            background: #00b894;
+            box-shadow: 0 0 0 4px rgba(0, 184, 148, 0.15);
+        }
+        .radio-group input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fff;
+        }
+        .radio-group input[type="radio"]:hover {
+            border-color: #00b894;
+        }
+
+        /* ===== DROPDOWNS ===== */
+        .dropdown-group {
+            margin: 10px 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: 2px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+        }
+        .dropdown-group:hover {
+            border-color: #00b894;
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.1);
+        }
+        .dropdown-group label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #636e72;
+            white-space: nowrap;
+        }
+        .dropdown-group select {
+            padding: 8px 14px;
+            font-size: 14px;
+            font-family: 'Prompt', sans-serif;
+            border-radius: 8px;
+            border: 1px solid #dfe6e9;
+            background: #f8f9fa;
+            color: #2d3436;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 130px;
+            outline: none;
+        }
+        .dropdown-group select:hover {
+            border-color: #00b894;
+        }
+        .dropdown-group select:focus {
+            border-color: #00b894;
+            box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.12);
+        }
+        .dropdown-group select option {
+            background: #fff;
+            color: #2d3436;
+        }
+        .dropdown-group select:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* ===== CALL BUTTONS ===== */
+        .call-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px auto;
+            max-width: 900px;
+            padding: 0 10px;
+        }
+        .call-button {
+            background: #ffffff;
+            color: #2d3436;
+            padding: 10px 20px;
+            border: 2px solid #e8e8e8;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .call-button:disabled {
+            background: #f1f2f6;
+            color: #b2bec3;
+            border-color: #dfe6e9;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .call-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: #fff;
+            border-color: transparent;
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(0, 184, 148, 0.3);
+        }
+
+        /* ===== PEOPLE GRID ===== */
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .person-card {
+            border: 2px solid #e8e8e8;
+            padding: 18px 12px 16px;
+            border-radius: 16px;
+            text-align: center;
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.35s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .person-card:hover {
+            transform: translateY(-6px);
+            border-color: #00b894;
+            box-shadow: 0 12px 35px rgba(0, 184, 148, 0.15);
+        }
+        .person-image {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            object-fit: cover;
+            border: 3px solid #dfe6e9;
+            transition: all 0.3s ease;
+        }
+        .person-card:hover .person-image {
+            border-color: #00b894;
+            transform: scale(1.08);
+        }
+        .person-card h4 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2d3436;
+            margin-bottom: 8px;
+        }
+        .button {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: #fff;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 6px;
+            width: 100%;
+            font-family: 'Prompt', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.2);
+        }
+        .button i {
+            margin-right: 4px;
+        }
+        .button:disabled {
+            background: #dfe6e9;
+            color: #b2bec3;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .button:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 20px rgba(0, 184, 148, 0.35);
+        }
+
+        /* ===== SELECTED LIST ===== */
+        .selected-list-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #ffffff;
+            border: 2px solid #e8e8e8;
+            padding: 18px;
+            border-radius: 16px;
+            width: 300px;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            z-index: 50;
+        }
+        .selected-list-container h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 12px;
+            color: #00b894;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        .selected-list-container h3::before {
+            content: '\f0ca';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+        }
+        .selected-list-container ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .selected-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #f0f0f0;
+            font-size: 14px;
+            color: #2d3436;
+            transition: all 0.2s ease;
+        }
+        .selected-list-item:hover {
+            background: #f0fdfa;
+            border-color: #00b894;
+        }
+        .remove-button {
+            background: #fff5f5;
+            color: #e74c3c;
+            border: 1px solid #fde8e8;
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 5px 8px;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        .remove-button:hover {
+            background: #e74c3c;
+            color: #fff;
+            border-color: #e74c3c;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        .selected-list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .selected-list-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .selected-list-container::-webkit-scrollbar-thumb {
+            background: #dfe6e9;
+            border-radius: 3px;
+        }
+        .selected-list-container::-webkit-scrollbar-thumb:hover {
+            background: #b2bec3;
+        }
+
+        /* ===== FADE-IN ANIMATION ===== */
+        .person-card {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+        .person-card:nth-child(1) { animation-delay: 0.00s; }
+        .person-card:nth-child(2) { animation-delay: 0.04s; }
+        .person-card:nth-child(3) { animation-delay: 0.08s; }
+        .person-card:nth-child(4) { animation-delay: 0.12s; }
+        .person-card:nth-child(5) { animation-delay: 0.16s; }
+        .person-card:nth-child(6) { animation-delay: 0.20s; }
+        .person-card:nth-child(7) { animation-delay: 0.24s; }
+        .person-card:nth-child(8) { animation-delay: 0.28s; }
+        .person-card:nth-child(9) { animation-delay: 0.32s; }
+        .person-card:nth-child(10) { animation-delay: 0.36s; }
+        .person-card:nth-child(11) { animation-delay: 0.40s; }
+        .person-card:nth-child(12) { animation-delay: 0.44s; }
+        .person-card:nth-child(13) { animation-delay: 0.48s; }
+        .person-card:nth-child(14) { animation-delay: 0.52s; }
+        .person-card:nth-child(15) { animation-delay: 0.56s; }
+        .person-card:nth-child(16) { animation-delay: 0.60s; }
+        .person-card:nth-child(17) { animation-delay: 0.64s; }
+        .person-card:nth-child(18) { animation-delay: 0.68s; }
+        .person-card:nth-child(19) { animation-delay: 0.72s; }
+        .person-card:nth-child(20) { animation-delay: 0.76s; }
+        .person-card:nth-child(21) { animation-delay: 0.80s; }
+        .person-card:nth-child(22) { animation-delay: 0.84s; }
+        .person-card:nth-child(23) { animation-delay: 0.88s; }
+        .person-card:nth-child(24) { animation-delay: 0.92s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+                margin: 20px 0 10px;
+            }
+            h1::before, h1::after {
+                font-size: 1.4rem;
+            }
+            .navbar {
+                gap: 4px;
+                padding: 10px 10px;
+            }
+            .navbar a {
+                font-size: 14px;
+                padding: 8px 14px;
+            }
+            .container {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                gap: 12px;
+                padding: 0 12px;
+            }
+            .person-card {
+                padding: 12px 8px;
+            }
+            .person-image {
+                width: 56px;
+                height: 56px;
+            }
+            .person-card h4 {
+                font-size: 12px;
+            }
+            .selected-list-container {
+                position: static;
+                width: 90%;
+                margin: 20px auto;
+                max-height: 300px;
+            }
+            .dropdown-group {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin: 6px 4px;
+                padding: 8px 12px;
+            }
+            .dropdown-group select {
+                min-width: 100px;
+                font-size: 13px;
+            }
+            .call-buttons {
+                gap: 8px;
+            }
+            .call-button {
+                font-size: 12px;
+                padding: 8px 14px;
+            }
+            .radio-group label {
+                font-size: 14px;
+                padding: 10px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="#Home" onclick="clearSelectedItems()"><i class="fas fa-home"></i> HOME</a>
+        <a href="#Call" onclick="enableRadioButtons();"><i class="fas fa-phone-volume"></i> CALL</a>
+        <a href="#PlaySound" onclick="playSelectedSounds()" id="playButton"><i class="fas fa-play"></i> PLAY</a>
+        <a href="#Cancel" onclick="reloadPage()" id="Cancel"><i class="fa-duotone fa-solid fa-power-off"></i> CANCEL</a>
+    </div>
+
+    <h1>TNLX PHONE</h1>
+
+    <div class="radio-group">
+        <label>
+            <input type="radio" name="option" value="notifyCal" onclick="handleRadioClick(this)"> แจ้งรถขึ้น
+        </label>
+        <label>
+            <input type="radio" name="option" value="callMeeting" onclick="handleRadioClick(this)"> เรียกประชุม / รับโทรศัพท์ / แจ้งรถกลับมา & รถมารับ
+        </label>
+    </div>
+
+    <div class="dropdown-group">
+        <label for="soundGroupWantToCall">เลือกรถ/พนักงาน :</label>
+        <select id="soundGroupWantToCall" onchange="SelectedDropdownWTC(this)">
+            <option value="">--เลือก--</option>
+            <option value="มีรถเหมาขึ้นลำพูน" data-name="มีรถเหมาขึ้นลำพูน">มีรถเหมาขึ้นลำพูน</option>
+            <option value="มีรถขึ้นศรีราชา" data-name="มีรถขึ้นศรีราชา">มีรถขึ้นศรีราชา</option>
+            <option value="มีรถขึ้นแม่สอด" data-name="มีรถขึ้นแม่สอด">มีรถขึ้นแม่สอด</option>
+            <option value="มีรถฝากขึ้นลำพูน" data-name="มีรถฝากขึ้นลำพูน">มีรถฝากขึ้นลำพูน</option>
+        </select>
+    </div>
+
+    <div class="dropdown-group">
+        <label for="soundGroupDaysOffWeek">ใน :</label>
+        <select id="soundGroupDaysOffWeek" onchange="SelectedDropdownDOW(this)">
+            <option value="">--เลือกวัน--</option>
+            <option value="วันนี้" data-name="วันนี้">วันนี้</option>
+            <option value="วันพรุ่งนี้" data-name="วันพรุ่งนี้">วันพรุ่งนี้</option>
+            <option value="วันจันทร์" data-name="วันจันทร์">วันจันทร์</option>
+            <option value="วันอังคาร" data-name="วันอังคาร">วันอังคาร</option>
+            <option value="วันพุธ" data-name="วันพุธ">วันพุธ</option>
+            <option value="วันพฤหัสบดี" data-name="วันพฤหัสบดี">วันพฤหัสบดี</option>
+            <option value="วันศุกร์" data-name="วันศุกร์">วันศุกร์</option>
+            <option value="วันเสาร์" data-name="วันเสาร์">วันเสาร์</option>
+        </select>
+    </div>
+
+    <div class="dropdown-group">
+        <label for="soundGroupNumDays" disabled>ที่ :</label>
+        <select id="soundGroupNumDays" onchange="SelectedDropdownNumDays(this)">
+            <option value="">--เลือกวันที่--</option>
+            <option value="วันนี้" data-name="วันนี้">วันนี้</option>
+            <option value="วันพรุ่งนี้" data-name="วันพรุ่งนี้">วันพรุ่งนี้</option>
+            <option value="1" data-name="1">1</option>
+            <option value="2" data-name="2">2</option>
+            <option value="3" data-name="3">3</option>
+            <option value="4" data-name="4">4</option>
+            <option value="5" data-name="5">5</option>
+            <option value="6" data-name="6">6</option>
+            <option value="7" data-name="7">7</option>
+            <option value="8" data-name="8">8</option>
+            <option value="9" data-name="9">9</option>
+            <option value="10" data-name="10">10</option>
+            <option value="11" data-name="11">11</option>
+            <option value="12" data-name="12">12</option>
+            <option value="13" data-name="13">13</option>
+            <option value="14" data-name="14">14</option>
+            <option value="15" data-name="15">15</option>
+            <option value="16" data-name="16">16</option>
+            <option value="17" data-name="17">17</option>
+            <option value="18" data-name="18">18</option>
+            <option value="19" data-name="19">19</option>
+            <option value="20" data-name="20">20</option>
+            <option value="21" data-name="21">21</option>
+            <option value="22" data-name="22">22</option>
+            <option value="23" data-name="23">23</option>
+            <option value="24" data-name="24">24</option>
+            <option value="25" data-name="25">25</option>
+            <option value="26" data-name="26">26</option>
+            <option value="27" data-name="27">27</option>
+            <option value="28" data-name="28">28</option>
+            <option value="29" data-name="29">29</option>
+            <option value="30" data-name="30">30</option>
+            <option value="31" data-name="31">31</option>
+        </select>
+    </div>
+
+    <div class="dropdown-group">
+        <label for="soundGroupTime" disabled>เลือกเวลา :</label>
+        <select id="soundGroupTime" onchange="SelectedDropdownTime(this)">
+            <option value="">--เลือกเวลา--</option>
+            <option value="08:00 น." data-name="08:00 น.">08:00 น.</option>
+            <option value="09:00 น." data-name="09:00 น.">09:00 น.</option>
+            <option value="10:00 น." data-name="10:00 น.">10:00 น.</option>
+            <option value="11:00 น." data-name="11:00 น.">11:00 น.</option>
+            <option value="12:00 น." data-name="12:00 น.">12:00 น.</option>
+            <option value="13:00 น." data-name="13:00 น.">13:00 น.</option>
+            <option value="14:00 น." data-name="14:00 น.">14:00 น.</option>
+            <option value="15:00 น." data-name="15:00 น.">15:00 น.</option>
+            <option value="16:00 น." data-name="16:00 น.">16:00 น.</option>
+            <option value="17:00 น." data-name="17:00 น.">17:00 น.</option>
+        </select>
+    </div>
+
+    <div class="call-buttons">
+        <button class="call-button" onclick="selectCallOption('119')" id="119" disabled>119</button>
+        <button class="call-button" onclick="selectCallOption('200')" id="200" disabled>200</button>
+        <button class="call-button" onclick="selectCallOption('ห้องประชุม')" id="callMeeting" disabled>ห้องประชุม</button>
+        <button class="call-button" onclick="selectCallOption('คอนโทรลเซ็นเตอร์')" id="callControl" disabled>ห้องคอนโทรล</button>
+        <button class="call-button" onclick="selectCallOption('โต๊ะสรุปหนังค่ะ')" id="callControl" disabled>โต๊ะสรุปหนัง</button>
+        <button class="call-button" onclick="selectCallOption('รถแม่สอดมาถึงแล้ว')" id="callmasod" disabled>รถแม่สอดมาถึงแล้ว</button>
+        <button class="call-button" onclick="selectCallOption('รถลำพูนมาถึงแล้ว')" id="callmasod" disabled>รถลำพูนมาถึงแล้ว</button>
+        <button class="call-button" onclick="selectCallOption('รถศรีราชามาถึงแล้ว')" id="callmasod" disabled>รถศรีราชามาถึงแล้ว</button>
+        <button class="call-button" onclick="selectCallOption('รถรันเวย์มาถึงแล้ว')" id="callmasod" disabled>รถรันเวย์มาถึงแล้ว</button>
+        <button class="call-button" onclick="selectCallOption('รถอิตาเลียนมารับ')" id="callmasod" disabled>รถอิตาเลียนมารับ</button>
+        <button class="call-button" onclick="selectCallOption('รถอิตาเลียนมาส่ง')" id="callmasod" disabled>รถอิตาเลียนมาส่ง</button>
+    </div>
+
+    <div class="container" id="people-container">
+        <!-- การ์ดคนจะถูกเพิ่มที่นี่ -->
+    </div>
+
+    <div class="selected-list-container">
+        <h3>รายการที่เลือก</h3>
+        <ul id="selectedList"></ul>
+    </div>
+
+    <script>
+        const people = [
+            { name: "หัวหน้าหน่วย", imageUrl: "image/avatar_m.jpg", soundFile: "เรียนหัวหน้าหน่วย.wav" },
+            { name: "หัวหน้าทีม", imageUrl: "image/avatar_m.jpg", soundFile: "เรียนหัวหน้าทีม.wav" },
+            { name: "@all", imageUrl: "image/avatar_m.jpg", soundFile: "พนักงานผลิตเครื่องหนังทุกท่าน.wav" },
+            { name: "ช่าง", imageUrl: "image/avatar_m.jpg", soundFile: "ช่างซ่อมบำรุง.wav" },
+            { name: "แม่บ้าน", imageUrl: "image/avatar_m.jpg", soundFile: "คุณแม่บ้าน.wav" },
+            { name: "ทีมเทคนิค", imageUrl: "image/avatar_m.jpg", soundFile: "เรียนทีมเทคนิค.wav" },
+            { name: "ทุกหน่วยงาน", imageUrl: "image/avatar_m.jpg", soundFile: "เรียนทุกหน่วยงาน.wav" },
+            { name: "รายเดือน", imageUrl: "image/avatar_m.jpg", soundFile: "เรียนรายเดือน.wav" },
+            { name: "คุณไพรฑูรย์", imageUrl: "image/avatar_m.jpg", soundFile: "คุณไพรฑูรย์.wav" },
+            { name: "คุณนิตินัย", imageUrl: "image/avatar_m.jpg", soundFile: "คุณนิตินัย.wav" },
+            { name: "คุณสมศักดิ์", imageUrl: "image/avatar_m.jpg", soundFile: "คุณสมศักดิ์.wav" },
+            { name: "คุณจินตนา", imageUrl: "image/avatar_m.jpg", soundFile: "คุณจินตนา.wav" },
+            { name: "คุณมยุเรศ", imageUrl: "image/avatar_m.jpg", soundFile: "คุณมยุเรศ.wav" },
+            { name: "คุณบุษกร", imageUrl: "image/avatar_m.jpg", soundFile: "คุณบุษกร.wav" },
+            { name: "คุณวิษณุ", imageUrl: "image/avatar_m.jpg", soundFile: "คุณวิษณุ.wav" },
+            { name: "คุณศิริญาตรี", imageUrl: "image/avatar_m.jpg", soundFile: "คุณศิริญาตรี.wav" },
+            { name: "คุณบุณยานุช", imageUrl: "image/avatar_m.jpg", soundFile: "คุณบุณยานุช.wav" },
+            { name: "คุณศศิวรรณ", imageUrl: "image/avatar_m.jpg", soundFile: "คุณศศิวรรณ.wav" },
+            { name: "คุณปริชาติ", imageUrl: "image/avatar_m.jpg", soundFile: "คุณปริชาติ.wav" },
+            { name: "คุณวุฒิพงษ์", imageUrl: "image/avatar_m.jpg", soundFile: "คุณวุฒิพงษ์.wav" },
+            { name: "คุณสันติ", imageUrl: "image/avatar_m.jpg", soundFile: "คุณสันติ.wav" },
+            { name: "คุณดวงตา", imageUrl: "image/avatar_m.jpg", soundFile: "คุณดวงตา.wav" },
+            { name: "คุณรุจินันท์", imageUrl: "image/avatar_m.jpg", soundFile: "คุณรุจินันท์.wav" },
+            { name: "เสาวลักษณ์", imageUrl: "image/avatar_m.jpg", soundFile: "คุณเสาวลักษณ์.wav" },
+        ];
+
+        let selectedSounds = [];
+        let selectedCallOption = null;
+
+        function loadPeople() {
+            disableRadioButtons();
+            DisableDropdownWantToCall(true);
+            toggleDropdown(true);
+            DisableDropdownNumDays(true);
+            DisableDropdownTime(true);
+            const container = document.getElementById("people-container");
+            people.forEach(person => {
+                const personCard = document.createElement("div");
+                personCard.className = "person-card";
+                personCard.innerHTML = `
+                    <img class="person-image" src="${person.imageUrl}" alt="${person.name}">
+                    <h4>${person.name}</h4>
+                    <button class="button sound-button" onclick="playSound('${person.soundFile}', '${person.name}')" id="SoundButton" disabled><i class="fas fa-phone-volume"> CALL</i></button>
+                `;
+                container.appendChild(personCard);
+            });
+        }
+
+        function enableSoundButtonsCall() {
+            const soundButtons = document.querySelectorAll(".sound-button");
+            soundButtons.forEach(button => {
+                button.disabled = false;
+                button.addEventListener("click", enableCallButtons);
+            });
+            document.getElementById("playButton").disabled = false;
+        }
+
+        function disableAllCallButtons() {
+            const callButtons = document.querySelectorAll(".call-buttons .call-button");
+            callButtons.forEach(function(button) {
+                button.disabled = true;
+            });
+            document.getElementById("playButton").disabled = true;
+        }
+
+        function enableSoundButtons() {
+            const soundButtons = document.querySelectorAll(".sound-button");
+            soundButtons.forEach(button => {
+                button.disabled = false;
+            });
+            document.getElementById("playButton").disabled = false;
+        }
+
+        function disableSoundButtons() {
+            const soundButtons = document.querySelectorAll(".sound-button");
+            soundButtons.forEach(button => {
+                button.disabled = true;
+            });
+            document.getElementById("playButton").disabled = true;
+        }
+
+        function reloadPage() {
+            location.reload();
+            clearAllDropdown();
+            resetURL();
+        }
+
+        function goToHome() {
+            reloadPage();
+            window.location.href = "#Home";
+        }
+
+        function disableAllSoundButtons() {
+            const soundButtons = document.querySelectorAll(".button.sound-button");
+            soundButtons.forEach(button => {
+                button.disabled = true;
+            });
+        }
+
+        function disableRemoveButton(index) {
+            const removeButton = document.querySelector(`.remove-button[onclick="removeFromSelectedList(${index})"]`);
+            if (removeButton) {
+                removeButton.disabled = true;
+            }
+        }
+
+        function enableCallButtons() {
+            const callButtons = document.querySelectorAll(".call-button");
+            callButtons.forEach(button => {
+                button.disabled = false;
+                button.addEventListener("click", () => {
+                    removeFromSelectedList(100);
+                    disableAllSoundButtons();
+                });
+            });
+        }
+
+        function SelectedDropdownWTC(selectElement) {
+            const selectedValue = selectElement.value;
+            switch (selectedValue) {
+                case "มีรถเหมาขึ้นลำพูน":
+                    selectCallOptionWantToCall('มีรถเหมาขึ้นลำพูน');
+                    toggleDropdown(false);
+                    const option200 = selectElement.querySelector('option[value="200"]');
+                    const optionCallMeeting = selectElement.querySelector('option[value="callMeeting"]');
+                    if (option200) option200.disabled = true;
+                    if (optionCallMeeting) optionCallMeeting.disabled = true;
+                    break;
+                case "มีรถขึ้นศรีราชา":
+                    selectCallOptionWantToCall('มีรถขึ้นศรีราชา');
+                    toggleDropdown(false);
+                    break;
+                case "มีรถขึ้นแม่สอด":
+                    selectCallOptionWantToCall('มีรถขึ้นแม่สอด');
+                    toggleDropdown(false);
+                    break;
+                case "มีรถฝากขึ้นลำพูน":
+                    selectCallOptionWantToCall('มีรถฝากขึ้นลำพูน');
+                    toggleDropdown(false);
+                    break;
+                case "callControl":
+                    selectCallOptionWantToCall('callControl');
+                    toggleDropdown(false);
+                    break;
+                case "callMasod":
+                    selectCallOptionWantToCall('callMasod');
+                    toggleDropdown(false);
+                    break;
+                default:
+                    console.log("ไม่ได้เลือกอะไร");
+                    break;
+            }
+        }
+
+        function selectCallOptionWantToCall(option) {
+            console.log("เรียกฟังก์ชันกับตัวเลือก:", option);
+        }
+
+        function SelectedDropdownDOW(selectElement) {
+            const selectedValue = selectElement.value;
+            switch (selectedValue) {
+                case "วันนี้":
+                    selectCallOptionDaysOffWeek('วันนี้');
+                    DisableDropdownNumDays(true);
+                    DisableDropdownTime(false);
+                    break;
+                case "วันพรุ่งนี้":
+                    selectCallOptionDaysOffWeek('วันพรุ่งนี้');
+                    DisableDropdownNumDays(true);
+                    DisableDropdownTime(false);
+                    break;
+                case "วันจันทร์":
+                    selectCallOptionDaysOffWeek('วันจันทร์');
+                    DisableDropdownNumDays(true);
+                    DisableDropdownTime(false);
+                    break;
+                case "วันอังคาร":
+                    selectCallOptionDaysOffWeek('วันอังคาร');
+                    DisableDropdownNumDays(true);
+                    DisableDropdownTime(false);
+                    break;
+                case "วันพุธ":
+                    selectCallOptionDaysOffWeek('วันพุธ');
+                    DisableDropdownNumDays(true);
+                    DisableDropdownTime(false);
+                    break;
+                case "วันพฤหัสบดี":
+                    selectCallOptionDaysOffWeek('วันพฤหัสบดี');
+                    DisableDropdownNumDays(true);
+                    DisableDropdownTime(false);
+                    break;
+                case "วันศุกร์":
+                    selectCallOptionDaysOffWeek('วันศุกร์');
+                    DisableDropdownNumDays(true);
+                    DisableDropdownTime(false);
+                    break;
+                case "วันเสาร์":
+                    selectCallOptionDaysOffWeek('วันเสาร์');
+                    DisableDropdownNumDays(true);
+                    DisableDropdownTime(false);
+                    break;
+                default:
+                    console.log("ไม่ได้เลือกอะไร");
+                    break;
+            }
+        }
+
+        function selectCallOptionDaysOffWeek(option) {
+            console.log("เรียกฟังก์ชันกับตัวเลือก:", option);
+        }
+
+        function SelectedDropdownNumDays(selectElement) {
+            const selectedValue = selectElement.value;
+            switch (selectedValue) {
+                case "วันนี้":
+                    selectCallOptionNumdays('วันนี้');
+                    DisableDropdownTime(false);
+                    break;
+                case "วันพรุ่งนี้":
+                    selectCallOptionNumdays('วันพรุ่งนี้');
+                    DisableDropdownTime(false);
+                    break;
+                case "1":
+                    selectCallOptionNumdays('1');
+                    DisableDropdownTime(false);
+                    break;
+                case "2":
+                    selectCallOptionNumdays('2');
+                    DisableDropdownTime(false);
+                    break;
+                case "3":
+                    selectCallOptionNumdays('3');
+                    DisableDropdownTime(false);
+                    break;
+                case "4":
+                    selectCallOptionNumdays('4');
+                    DisableDropdownTime(false);
+                    break;
+                case "5":
+                    selectCallOptionNumdays('5');
+                    DisableDropdownTime(false);
+                    break;
+                case "6":
+                    selectCallOptionNumdays('6');
+                    DisableDropdownTime(false);
+                    break;
+                case "7":
+                    selectCallOptionNumdays('7');
+                    DisableDropdownTime(false);
+                    break;
+                case "8":
+                    selectCallOptionNumdays('8');
+                    DisableDropdownTime(false);
+                    break;
+                case "9":
+                    selectCallOptionNumdays('9');
+                    DisableDropdownTime(false);
+                    break;
+                case "10":
+                    selectCallOptionNumdays('10');
+                    DisableDropdownTime(false);
+                    break;
+                case "11":
+                    selectCallOptionNumdays('11');
+                    DisableDropdownTime(false);
+                    break;
+                case "12":
+                    selectCallOptionNumdays('12');
+                    DisableDropdownTime(false);
+                    break;
+                case "13":
+                    selectCallOptionNumdays('13');
+                    DisableDropdownTime(false);
+                    break;
+                case "14":
+                    selectCallOptionNumdays('14');
+                    DisableDropdownTime(false);
+                    break;
+                case "15":
+                    selectCallOptionNumdays('15');
+                    DisableDropdownTime(false);
+                    break;
+                case "16":
+                    selectCallOptionNumdays('16');
+                    DisableDropdownTime(false);
+                    break;
+                case "17":
+                    selectCallOptionNumdays('17');
+                    DisableDropdownTime(false);
+                    break;
+                case "18":
+                    selectCallOptionNumdays('18');
+                    DisableDropdownTime(false);
+                    break;
+                case "19":
+                    selectCallOptionNumdays('19');
+                    DisableDropdownTime(false);
+                    break;
+                case "20":
+                    selectCallOptionNumdays('20');
+                    DisableDropdownTime(false);
+                    break;
+                case "21":
+                    selectCallOptionNumdays('21');
+                    DisableDropdownTime(false);
+                    break;
+                case "22":
+                    selectCallOptionNumdays('22');
+                    DisableDropdownTime(false);
+                    break;
+                case "23":
+                    selectCallOptionNumdays('23');
+                    DisableDropdownTime(false);
+                    break;
+                case "24":
+                    selectCallOptionNumdays('24');
+                    DisableDropdownTime(false);
+                    break;
+                case "25":
+                    selectCallOptionNumdays('25');
+                    DisableDropdownTime(false);
+                    break;
+                case "26":
+                    selectCallOptionNumdays('26');
+                    DisableDropdownTime(false);
+                    break;
+                case "27":
+                    selectCallOptionNumdays('27');
+                    DisableDropdownTime(false);
+                    break;
+                case "28":
+                    selectCallOptionNumdays('28');
+                    DisableDropdownTime(false);
+                    break;
+                case "29":
+                    selectCallOptionNumdays('29');
+                    DisableDropdownTime(false);
+                    break;
+                case "30":
+                    selectCallOptionNumdays('30');
+                    DisableDropdownTime(false);
+                    break;
+                case "31":
+                    selectCallOptionNumdays('31');
+                    DisableDropdownTime(false);
+                    break;
+                default:
+                    console.log("ไม่ได้เลือกอะไร");
+                    break;
+            }
+        }
+
+        function selectCallOptionNumdays(option) {
+            console.log("เรียกฟังก์ชันกับตัวเลือก:", option);
+        }
+
+        function SelectedDropdownTime(selectElement) {
+            const selectedValue = selectElement.value;
+            switch (selectedValue) {
+                case "08:00 น.":
+                    selectCallOptionTime('8_นาฬิกา');
+                    break;
+                case "09:00 น.":
+                    selectCallOptionTime('9_นาฬิกา');
+                    break;
+                case "10:00 น.":
+                    selectCallOptionTime('10_นาฬิกา');
+                    break;
+                case "11:00 น.":
+                    selectCallOptionTime('11_นาฬิกา');
+                    break;
+                case "12:00 น.":
+                    selectCallOptionTime('12_นาฬิกา');
+                    break;
+                case "13:00 น.":
+                    selectCallOptionTime('13_นาฬิกา');
+                    break;
+                case "14:00 น.":
+                    selectCallOptionTime('14_นาฬิกา');
+                    break;
+                case "15:00 น.":
+                    selectCallOptionTime('15_นาฬิกา');
+                    break;
+                case "16:00 น.":
+                    selectCallOptionTime('16_นาฬิกา');
+                    break;
+                case "17:00 น.":
+                    selectCallOptionTime('17_นาฬิกา');
+                    break;
+                default:
+                    console.log("ไม่ได้เลือกอะไร");
+                    break;
+            }
+        }
+
+        function selectCallOptionTime(option) {
+            console.log("เรียกฟังก์ชันกับตัวเลือก:", option);
+        }
+
+        function playSound(soundFile, personName) {
+            addToSelectedList(personName, soundFile);
+        }
+
+        function addToSelectedList(name, soundFile) {
+            if (!selectedSounds.find(item => item.name === name)) {
+                selectedSounds.push({ name, soundFile });
+                updateSelectedList();
+            }
+        }
+
+        function updateSelectedList() {
+            const list = document.getElementById("selectedList");
+            list.innerHTML = '';
+            selectedSounds.forEach((item, index) => {
+                const listItem = document.createElement("li");
+                listItem.className = "selected-list-item";
+                listItem.innerHTML = `
+                    ${item.name}
+                    <button class="remove-button" onclick="removeFromSelectedList(${index})"><i class="fa-solid fa-trash"></i></button>
+                `;
+                list.appendChild(listItem);
+            });
+        }
+
+        function removeFromSelectedList(index) {
+            const removed = selectedSounds.splice(index, 1)[0];
+            if (removed && removed.name === selectedCallOption) {
+                enableAllCallOptions();
+                selectedCallOption = null;
+            }
+            updateSelectedList();
+        }
+
+        function clearAllDropdown() {
+            clearDropdownWantToCall();
+            clearDropdownDayOffWeek();
+            clearDropdownNumDays();
+            clearDropdownTime();
+            clearSelectedItems();
+        }
+
+        function clearDropdownWantToCall() {
+            const dropdown = document.getElementById("soundGroupWantToCall");
+            dropdown.value = "";
+        }
+
+        function clearDropdownDayOffWeek() {
+            const dropdown = document.getElementById("soundGroupDaysOffWeek");
+            dropdown.value = "";
+        }
+
+        function clearDropdownNumDays() {
+            const dropdown = document.getElementById("soundGroupNumDays");
+            dropdown.value = "";
+        }
+
+        function clearDropdownTime() {
+            const dropdown = document.getElementById("soundGroupTime");
+            dropdown.value = "";
+        }
+
+        function ToDay() {
+            const dropdown = document.getElementById("soundGroupNumDays");
+            dropdown.value = "วันนี้";
+        }
+
+        function Tomorrow() {
+            const dropdown = document.getElementById("soundGroupNumDays");
+            dropdown.value = "วันพรุ่งนี้";
+        }
+
+        function clearSelectedList() {
+            selectedSounds = [];
+            updateSelectedList();
+        }
+
+        function clearSelectedItems() {
+            selectedList = [];
+            const selectedItemsContainer = document.getElementById("selectedItems");
+            if (selectedItemsContainer) {
+                selectedItemsContainer.innerHTML = "";
+            }
+        }
+
+        function selectCallOption(callLabel) {
+            selectedCallOption = callLabel;
+            addToSelectedList(`ขอเชิญที่ : ${callLabel}`, `${callLabel}.wav`);
+            disableOtherCallOptions(callLabel);
+            enableSoundButtons();
+        }
+
+        function selectCallOptionWantToCall(callLabel) {
+            selectedCallOption = callLabel;
+            addToSelectedList(`Start -> : ${callLabel}`, `${callLabel}.wav`);
+            disableOtherCallOptions(callLabel);
+        }
+
+        function selectCallOptionDaysOffWeek(callLabel) {
+            selectedCallOption = callLabel;
+            addToSelectedList(`ใน -> : ${callLabel}`, `${callLabel}.wav`);
+            disableOtherCallOptions(callLabel);
+        }
+
+        function selectCallOptionNumdays(callLabel) {
+            selectedCallOption = callLabel;
+            addToSelectedList(`ที่ -> : ${callLabel}`, `${callLabel}.wav`);
+            disableOtherCallOptions(callLabel);
+        }
+
+        function selectCallOptionTime(callLabel) {
+            selectedCallOption = callLabel;
+            addToSelectedList(`เวลา -> : ${callLabel}`, `${callLabel}.wav`);
+            disableOtherCallOptions(callLabel);
+        }
+
+        function disableRadioButtons() {
+            const radioButtons = document.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach(radio => {
+                radio.disabled = true;
+            });
+        }
+
+        function enableRadioButtons() {
+            const radioButtons = document.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach(radio => {
+                radio.disabled = false;
+            });
+        }
+
+        function handleRadioClick(radio) {
+            if (radio.value === "notifyCal") {
+                DisableDropdownWantToCall(false);
+                toggleDropdown(true);
+                DisableDropdownNumDays(true);
+                disableAllSoundButtons();
+                disableAllCallButtons();
+                clearSelectedList();
+                clearAllDropdown();
+            } else {
+                enableSoundButtonsCall();
+                DisableDropdownWantToCall(true);
+                toggleDropdown(true);
+                clearAllDropdown();
+                clearSelectedList();
+                DisableDropdownNumDays(true);
+                DisableDropdownTime(true);
+            }
+        }
+
+        function DisableDropdownWantToCall(isDisabled) {
+            document.getElementById("soundGroupWantToCall").disabled = isDisabled;
+        }
+
+        function toggleDropdown(isDisabled) {
+            document.getElementById("soundGroupDaysOffWeek").disabled = isDisabled;
+        }
+
+        function DisableDropdownNumDays(isDisabled) {
+            document.getElementById("soundGroupNumDays").disabled = isDisabled;
+        }
+
+        function DisableDropdownTime(isDisabled) {
+            document.getElementById("soundGroupTime").disabled = isDisabled;
+        }
+
+        function disableOtherCallOptions(selected) {
+            const buttons = document.querySelectorAll(".call-button");
+            buttons.forEach(button => {
+                if (button.id !== `call${selected}`) button.disabled = true;
+            });
+        }
+
+        function enableAllCallOptions() {
+            const buttons = document.querySelectorAll(".call-button");
+            buttons.forEach(button => button.disabled = false);
+        }
+
+        function resetURL() {
+            //window.history.pushState({}, document.title, window.location.pathname);
+        }
+
+        function playSelectedSounds() {
+            if (!selectedSounds.length) return;
+
+            const playSequence = [
+                { name: "Start", soundFile: "Call.wav" },
+                ...selectedSounds,
+                ...selectedSounds,
+                { name: "thanks", soundFile: "ขอบคุณค่ะ.wav" },
+                { name: "End", soundFile: "Call.wav" }
+            ];
+
+            let playIndex = 0;
+            let playCount = 0;
+
+            function playNext() {
+                if (playIndex < playSequence.length) {
+                    const sound = new Audio(`sound/${playSequence[playIndex].soundFile}`);
+                    sound.play();
+                    sound.onended = () => {
+                        playIndex++;
+                        playNext();
+                    };
+                } else {
+                    playCount++;
+                    if (playCount < 1) {
+                        playIndex = 1;
+                        playNext();
+                    } else {
+                        reloadPage();
+                    }
+                }
+            }
+
+            const startSound = new Audio(`sound/${playSequence[0].soundFile}`);
+            startSound.play();
+            startSound.onended = () => {
+                playIndex = 1;
+                playNext();
+            };
+        }
+
+        loadPeople();
+    </script>
+</body>
+</html>

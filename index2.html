@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบ Call มารับโทรศัพท์</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-around;
+            background-color: #333;
+            padding: 10px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+        }
+        .navbar a:hover {
+            background-color: #575757;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .person-card {
+            width: 150px;
+            text-align: center;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .person-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 50%;
+        }
+        .sound-button, .call-button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .sound-button:disabled, .call-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .selected-list-container {
+            width: 80%;
+            margin: 20px auto;
+        }
+        #selectedList {
+            list-style: none;
+            padding: 0;
+        }
+        .selected-list-item {
+            display: flex;
+            justify-content: space-between;
+            background: #eee;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .remove-button {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="#home"><i class="fas fa-home"></i> HOME</a>
+        <a href="#Call" onclick="enableSoundButtons()"><i class="fas fa-phone-volume"></i> CALL</a>
+        <a href="#PlaySound" onclick="playSelectedSounds()"><i class="fas fa-play"></i> PLAY</a>
+    </div>
+
+    <h1>ระบบ Call มารับโทรศัพท์</h1>
+
+    <div class="container" id="people-container">
+        <!-- การ์ดคนจะถูกเพิ่มที่นี่ -->
+    </div>
+
+    <div class="selected-list-container">
+        <h3>รายการที่เลือก</h3>
+        <ul id="selectedList"></ul>
+    </div>
+
+    <script>
+        // ข้อมูลคนที่ใช้ในระบบ
+        const people = [
+        { name: "หัวหน้าหน่วย", imageUrl: "image/avatar_m.jpg", soundFile: "สมชาย.wav" },
+            { name: "หัวหน้าทีม", imageUrl: "image/avatar_m.jpg", soundFile: "สมหญิง.wav" },
+            { name: "จินตนา", imageUrl: "image/avatar_m.jpg", soundFile: "Jintana.wav" },
+            { name: "บุญชัย", imageUrl: "image/avatar_m.jpg", soundFile: "บุญชัย.wav" },
+            { name: "นิตยา", imageUrl: "image/avatar_m.jpg", soundFile: "นิตยา.wav" },
+            { name: "ปรัชญา", imageUrl: "image/avatar_m.jpg", soundFile: "ปรัชญา.wav" },
+            { name: "ศิริพร", imageUrl: "image/avatar_m.jpg", soundFile: "ศิริพร.wav" },
+            { name: "กาญจนา", imageUrl: "image/avatar_m.jpg", soundFile: "กาญจนา.wav" },
+            { name: "วิรัตน์", imageUrl: "image/avatar_m.jpg", soundFile: "วิรัตน์.wav" },
+            { name: "อรชร", imageUrl: "image/avatar_m.jpg", soundFile: "อรชร.wav" },
+            { name: "สุรีย์", imageUrl: "image/avatar_m.jpg", soundFile: "สุรีย์.wav" },
+            { name: "ปวีณา", imageUrl: "image/avatar_m.jpg", soundFile: "ปวีณา.wav" },
+            { name: "สมชาย", imageUrl: "image/avatar_m.jpg", soundFile: "สมชาย.wav" },
+            { name: "สมหญิง", imageUrl: "image/avatar_m.jpg", soundFile: "สมหญิง.wav" },
+            { name: "จินตนา", imageUrl: "image/avatar_m.jpg", soundFile: "Jintana.wav" },
+            { name: "บุญชัย", imageUrl: "image/avatar_m.jpg", soundFile: "บุญชัย.wav" },
+            { name: "นิตยา", imageUrl: "image/avatar_m.jpg", soundFile: "นิตยา.wav" },
+            { name: "ปรัชญา", imageUrl: "image/avatar_m.jpg", soundFile: "ปรัชญา.wav" },
+            { name: "ศิริพร", imageUrl: "image/avatar_m.jpg", soundFile: "ศิริพร.wav" },
+            { name: "กาญจนา", imageUrl: "image/avatar_m.jpg", soundFile: "กาญจนา.wav" },
+            { name: "วิรัตน์", imageUrl: "image/avatar_m.jpg", soundFile: "วิรัตน์.wav" },
+            { name: "อรชร", imageUrl: "image/avatar_m.jpg", soundFile: "อรชร.wav" },
+            { name: "สุรีย์", imageUrl: "image/avatar_m.jpg", soundFile: "สุรีย์.wav" },
+            { name: "ปวีณา", imageUrl: "image/avatar_m.jpg", soundFile: "ปวีณา.wav" },
+            { name: "นิตยา", imageUrl: "image/avatar_m.jpg", soundFile: "นิตยา.wav" },
+            { name: "ปรัชญา", imageUrl: "image/avatar_m.jpg", soundFile: "ปรัชญา.wav" },
+            { name: "ศิริพร", imageUrl: "image/avatar_m.jpg", soundFile: "ศิริพร.wav" },
+            { name: "กาญจนา", imageUrl: "image/avatar_m.jpg", soundFile: "กาญจนา.wav" },
+            { name: "วิรัตน์", imageUrl: "image/avatar_m.jpg", soundFile: "วิรัตน์.wav" },
+            { name: "อรชร", imageUrl: "image/avatar_m.jpg", soundFile: "อรชร.wav" },
+            { name: "สุรีย์", imageUrl: "image/avatar_m.jpg", soundFile: "สุรีย์.wav" },
+            { name: "ปวีณา", imageUrl: "image/avatar_m.jpg", soundFile: "ปวีณา.wav" },
+            // เพิ่มข้อมูลคนอื่นๆ ตามต้องการ
+        ];
+
+        // รายการเสียงที่เลือก
+        const selectedSounds = [];
+        
+        // ฟังก์ชันสำหรับโหลดข้อมูลคน
+        function loadPeople() {
+            const container = document.getElementById("people-container");
+            container.innerHTML = '';
+            people.forEach(person => {
+                const card = document.createElement("div");
+                card.className = "person-card";
+                card.innerHTML = `
+                    <img src="${person.imageUrl}" alt="${person.name}">
+                    <h3>${person.name}</h3>
+                    <button class="sound-button" onclick="playSound('${person.soundFile}', '${person.name}')" disabled>Play Sound</button>
+                    <button class="call-button" onclick="selectSound('${person.name}')" disabled>Select Call</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // เปิดปุ่มเสียง
+        function enableSoundButtons() {
+            const soundButtons = document.querySelectorAll(".sound-button, .call-button");
+            soundButtons.forEach(button => {
+                button.disabled = false;
+            });
+        }
+
+        // เล่นเสียงของบุคคล
+        function playSound(soundFile, personName) {
+            const audio = new Audio(`sound/${soundFile}`);
+            audio.play();
+            addToSelectedList(personName);
+        }
+
+        // เพิ่มชื่อในรายการที่เลือก
+        function addToSelectedList(name) {
+            if (!selectedSounds.includes(name)) {
+                selectedSounds.push(name);
+                updateSelectedList();
+            }
+        }
+
+        // อัปเดตการแสดงรายการที่เลือก
+        function updateSelectedList() {
+            const list = document.getElementById("selectedList");
+            list.innerHTML = '';
+            selectedSounds.forEach((name, index) => {
+                const listItem = document.createElement("li");
+                listItem.className = "selected-list-item";
+                listItem.innerHTML = `
+                    ${name}
+                    <button class="remove-button" onclick="removeFromSelectedList(${index})">ลบ</button>
+                `;
+                list.appendChild(listItem);
+            });
+        }
+
+        // ลบรายการที่เลือกออก
+        function removeFromSelectedList(index) {
+            selectedSounds.splice(index, 1);
+            updateSelectedList();
+        }
+
+        // เลือกเสียง Call
+        function selectSound(soundLabel) {
+            addToSelectedList(soundLabel);
+        }
+
+        // เล่นรายการที่เลือกตามเงื่อนไข
+        async function playSelectedSounds() {
+            if (selectedSounds.length === 0) return;
+
+            // เริ่มด้วยเสียง Call.wav
+            await playAudio('sound/Call.wav');
+
+            // เล่นเสียงในรายการที่เลือกจากบนลงล่าง
+            for (const sound of selectedSounds) {
+                await playAudio(`sound/${sound}.wav`);
+            }
+
+            // เล่นเสียงในรายการที่เลือก Call สองรอบ
+            for (let i = 0; i < 2; i++) {
+                for (const sound of selectedSounds) {
+                    await playAudio(`sound/${sound}.wav`);
+                }
+            }
+
+            // ปิดท้ายด้วยเสียง Call.wav
+            await playAudio('sound/Call.wav');
+
+            // รอ 3 วินาทีก่อนเรียกใช้ loadPeople() เพื่อรีเฟรช
+            setTimeout(loadPeople, 3000);
+        }
+
+        // ฟังก์ชันเล่นเสียงแบบซิงโครนัส
+        function playAudio(src) {
+            return new Promise((resolve) => {
+                const audio = new Audio(src);
+                audio.onended = resolve;
+                audio.play();
+            });
+        }
+
+        loadPeople(); // เรียกใช้เมื่อโหลดหน้าเสร็จ
+    </script>
+</body>
+</html>
